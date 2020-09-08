@@ -19,7 +19,7 @@ ul{
 
 .dark{
   padding: 15px;
-  background: #35424a;
+  background: #000000;
   color: #ffffff;
   margin-top: 10px;
   margin-bottom: 10px;
@@ -73,8 +73,8 @@ header a:hover{
 /* Showcase */
 #showcase {
   min-height: 800px;
-  background: url('../img/me.jpg') no-repeat;
-  background-size:contain;
+  background: url('../img/melong.jpg') no-repeat;
+  background-size:cover;
   background-position:top;
   background-color: #000000;
   text-align: center;
@@ -89,7 +89,7 @@ header a:hover{
 }
 
 #showcase p {
-  font-size: 20px;
+  font-size: 55px;
 }
 
 /* Boxes */
@@ -108,28 +108,92 @@ header a:hover{
   width:90px;
 }
 
-/* Sidebar */
+/* Sidebars */
 
-aside#sidebar{
+aside#about-sidebar{
   float: right;
-  width: 30%;
+  width: 450px;
+  margin-top: 10px;
+}
+aside#about-sidebar h3{
+  color:#e8491d;
+}
+aside#about-sidebar img{
+  max-height: 425px;
+  max-width: 425px;
+}
+
+aside#technical-skills-sidebar{
+  float: right;
+  width: 450px;
   margin-top: 10px;
 }
 
 /* main-col */
-article#main-col{
+article#projects-col{
   float: left;
-  width: 65%;
+  width: 800px;
+  margin-top: 20px;
+}
+
+article#about-me-col{
+  float: left;
+  width: 800px;
+  margin-top: 20px;
 }
 
 /* projects */
 
+section#project-contents {
+  display:flex;
+}
+
 ul#projects li{
   list-style: none;
   padding: 20px;
-  border: #cccccc solid 1px;
   margin-bottom: 5px;
-  background:#e6e6e6;
+  background:#40826D;
+}
+ul#projects h3{
+  color:#e8491d;
+  font-size: 30px;
+  width:100%;
+  margin: auto;
+}
+
+ul#projects p{
+  width:400px;
+}
+
+/* education */
+
+ul#education li{
+  list-style: none;
+  padding: 20px;
+  margin-bottom: 5px;
+  background:#40826D;
+}
+ul#education h3{
+  color:#e8491d;
+  font-size: 20px;
+}
+ul#education h6{
+  color:#e8491d;
+  margin: auto;
+  font-size: 14px;
+}
+
+/* about */
+
+ul#about li{
+  list-style: none;
+  padding: 20px;
+  margin-bottom: 5px;
+  background:#40826D;
+}
+ul#about h3{
+  color:#e8491d;
+  font-size: 30px;
 }
 
 footer{
@@ -139,7 +203,6 @@ footer{
   background-color: #e8491d;
   text-align: center;
 }
-
 
 /* media queries */
  @media(max-width:768px){
