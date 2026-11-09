@@ -1,0 +1,57 @@
+
+---
+const developer = "Phinion";
+const skills = ["Unity", "C#", "Game Development"];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Phinion | Game Developer</title>
+  </head>
+
+  <body>
+    <main>
+      <h1>Hey, I'm {developer}!</h1>
+      <p>I make games and cool stuff.</p>
+
+      <div class="skills">
+        {skills.map((skill) => (
+          <span>{skill}</span>
+        ))}
+      </div>
+    </main>
+  </body>
+</html>
+
+<style>
+  body {
+    margin: 0;
+    background: #111827;
+    color: white;
+    font-family: system-ui, sans-serif;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 100px auto;
+    padding: 2rem;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 8vw, 5rem);
+  }
+
+  .skills {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .skills span {
+    padding: 0.5rem 1rem;
+    background: #374151;
+    border-radius: 8px;
+  }
+</style>
