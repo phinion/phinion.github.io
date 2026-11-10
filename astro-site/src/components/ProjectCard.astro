@@ -1,5 +1,6 @@
-
 ---
+import YouTubeEmbed from "./YouTubeEmbed.astro";
+
 interface Props {
   title: string;
   description: string;
@@ -18,59 +19,21 @@ const {
   link
 } = Astro.props;
 
-// Convert a full YouTube URL into an embeddable URL.
-function getYouTubeEmbedUrl(url: string): string | null {
-  try {
-    const parsed = new URL(url);
-    const host = parsed.hostname.toLowerCase();
-    let videoId: string | null = null;
-
-    if (host === "youtu.be") {
-      videoId = parsed.pathname.split("/")[1];
-    } else if (
-      host === "youtube.com" ||
-      host === "www.youtube.com" ||
-      host === "m.youtube.com" ||
-      host === "www.youtube-nocookie.com"
-    ) {
-      if (parsed.pathname === "/watch") {
-        videoId = parsed.searchParams.get("v");
-      } else if (
-        parsed.pathname.startsWith("/embed/") ||
-        parsed.pathname.startsWith("/shorts/") ||
-        parsed.pathname.startsWith("/live/")
-      ) {
-        videoId = parsed.pathname.split("/")[2];
-      }
-    }
-
-    // Validate the YouTube video ID.
-    if (!videoId || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
-      return null;
-    }
-
-    return `https://www.youtube-nocookie.com/embed/${videoId}`;
-  } catch {
-    return null;
-  }
-}
-
-const embedUrl = youtubeUrl
-  ? getYouTubeEmbedUrl(youtubeUrl)
-  : null;
+// Check whether the project link is internal or external.
+const isExternalLink = link
+  ? /^https?:\/\//.test(link)
+  : false;
 ---
 
 <article class="project-card">
+
+  <!-- Project media -->
   <div class="project-media">
-    {embedUrl ? (
-      <iframe
-        src={embedUrl}
-        title={`${title} video`}
-        loading="lazy"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        referrerpolicy="strict-origin-when-cross-origin"
-        allowfullscreen
-      ></iframe>
+    {youtubeUrl ? (
+      <YouTubeEmbed
+        url={youtubeUrl}
+        title={`${title} Video`}
+      />
     ) : image ? (
       <img
         src={image}
@@ -78,27 +41,36 @@ const embedUrl = youtubeUrl
         loading="lazy"
       />
     ) : (
-      <div class="placeholder">🎮</div>
+      <div class="placeholder">
+        🎮
+      </div>
     )}
   </div>
 
+  <!-- Project information -->
   <div class="project-info">
-    <span class="category">{category}</span>
+
+    <span class="category">
+      {category}
+    </span>
 
     <h2>{title}</h2>
 
     <p>{description}</p>
 
+    <!-- Link to project homepage or external website -->
     {link && (
       <a
         href={link}
-        target="_blank"
-        rel="noopener noreferrer"
+        class="project-link"
+        target={isExternalLink ? "_blank" : undefined}
+        rel={isExternalLink ? "noopener noreferrer" : undefined}
       >
-        Visit project
+        View Project →
       </a>
     )}
 
+    <!-- Direct YouTube link -->
     {youtubeUrl && (
       <a
         href={youtubeUrl}
@@ -106,47 +78,70 @@ const embedUrl = youtubeUrl
         rel="noopener noreferrer"
         class="youtube-link"
       >
-        Watch on YouTube
+        Watch on YouTube ↗
       </a>
     )}
+
   </div>
 </article>
 
 <style>
   .project-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
     background: #202530;
     color: white;
+
     border-radius: 12px;
     overflow: hidden;
-    transition: transform 0.2s ease;
+
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
   .project-card:hover {
     transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   }
+
+  /* Media */
 
   .project-media {
+    width: 100%;
     aspect-ratio: 16 / 9;
+
     background: #141820;
+    overflow: hidden;
   }
 
-  .project-media iframe,
   .project-media img {
     display: block;
     width: 100%;
     height: 100%;
-    border: 0;
     object-fit: cover;
   }
 
   .placeholder {
     display: grid;
     place-items: center;
+
+    width: 100%;
     height: 100%;
+
     font-size: 3rem;
   }
 
+  /* Project information */
+
   .project-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1;
+
     padding: 1.25rem;
   }
 
@@ -154,6 +149,7 @@ const embedUrl = youtubeUrl
     color: #b8d47a;
     font-size: 0.8rem;
     font-weight: bold;
+    text-transform: capitalize;
   }
 
   h2 {
@@ -163,12 +159,13 @@ const embedUrl = youtubeUrl
 
   p {
     line-height: 1.6;
+    margin-bottom: 1.5rem;
   }
+
+  /* Links */
 
   a {
     display: inline-block;
-    margin-top: 0.75rem;
-    margin-right: 1rem;
     color: #b8d47a;
     text-decoration: none;
     font-weight: 600;
@@ -178,7 +175,25 @@ const embedUrl = youtubeUrl
     text-decoration: underline;
   }
 
+  .project-link {
+    margin-top: auto;
+    padding: 0.5rem 0;
+  }
+
   .youtube-link {
     color: #ff7878;
+    margin-top: 0.5rem;
+  }
+
+  /* Accessibility */
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-card {
+      transition: none;
+    }
+
+    .project-card:hover {
+      transform: none;
+    }
   }
 </style>

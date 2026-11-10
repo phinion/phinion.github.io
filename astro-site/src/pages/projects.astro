@@ -1,87 +1,13 @@
-
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ProjectCard from "../components/ProjectCard.astro";
+import { getCollection } from "astro:content";
 
-const projects = [
-  {
-    title: "Ashborn",
-    category: "Professional",
-    description:
-      "A 3D RPG developed in Unity, where I worked as lead programmer.",
-    image: "/img/ashbornIMG.png"
-  },
-  {
-    title: "Real Time Shadows Demo",
-    category: "University",
-    description:
-      "Real-time hard and soft shadow simulation using C++ and OpenGL.",
-    youtubeUrl: "https://youtu.be/WKsjZeUeNe4"
-  },
-  {
-    title: "Incrementum",
-    category: "University",
-    description:
-      "A psychological thriller created in Unity with a team of six developers and designers.",
-    youtubeUrl: "https://youtu.be/MnPYQWexebo"
-  },
-  {
-    title: "Zemiaball",
-    category: "University",
-    description:
-      "A 3D platformer made in Unity using C#.",
-    youtubeUrl: "https://youtu.be/SpCocheSk68"
-  },
-  {
-    title: "3D Game Engine",
-    category: "University",
-    description:
-      "A custom 3D engine built using OpenGL and a component-entity system.",
-    youtubeUrl: "https://youtu.be/DOHc-LiPZdo"
-  },
-  {
-    title: "Mandelbrot Fractal",
-    category: "University",
-    description:
-      "Experiments with SDL and C++ to generate colourful fractal patterns.",
-    youtubeUrl: "https://youtu.be/aSrxNcYajv0"
-  },
-  {
-    title: "Blackjack",
-    category: "University",
-    description:
-      "A single-player, console-based Blackjack game written in C++.",
-    youtubeUrl: "https://youtu.be/a9eGyd9urGs"
-  },
-  {
-    title: "Dirtball Wars",
-    category: "University",
-    description:
-      "A 2D game made using C++ and SDL, inspired by Raft Wars.",
-    youtubeUrl: "https://youtu.be/_uOkW79P-hc"
-  },
-  {
-    title: "Ignacio",
-    category: "University",
-    description:
-      "A platformer created using Construct as an introduction to game development.",
-    youtubeUrl: "https://youtu.be/k97Nx0AmN8o"
-  },
-  {
-    title: "The Tomb of Anubis",
-    category: "University",
-    description:
-      "A multiplayer tabletop board game designed around strategic card-based gameplay.",
-    youtubeUrl: "https://youtu.be/Ek9Dj50CA74"
-  },
-  {
-    title: "Amazing Katamari Damacy Marketing Proposal",
-    category: "University",
-    description:
-      "A simulated business marketing proposal, developed through a team project.",
-    youtubeUrl: "https://youtu.be/_t-IoOjHXrA"
-  }
-];
+const projects = await getCollection("projects");
+
+const sortedProjects = projects.sort((a, b) =>
+  a.data.title.localeCompare(b.data.title)
+);
 ---
 
 <BaseLayout
@@ -93,13 +19,20 @@ const projects = [
     <h1>My Projects</h1>
 
     <p>
-      A collection of games, software and creative
-      projects I've worked on over the years.
+      A collection of games, software and
+      creative projects I've worked on.
     </p>
 
     <div class="project-grid">
-      {projects.map((project) => (
-        <ProjectCard {...project} />
+      {sortedProjects.map((project) => (
+        <ProjectCard
+          title={project.data.title}
+          description={project.data.description}
+          category={project.data.category}
+          image={project.data.image}
+          youtubeUrl={project.data.youtubeUrl}
+          link={`/projects/${project.id}/`}
+        />
       ))}
     </div>
   </section>
@@ -107,8 +40,7 @@ const projects = [
 
 <style>
   .projects-page {
-    padding-top: 3rem;
-    padding-bottom: 4rem;
+    padding: 3rem 0 4rem;
   }
 
   .project-grid {

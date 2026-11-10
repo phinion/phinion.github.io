@@ -1,0 +1,214 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import YouTubeEmbed from "../../components/YouTubeEmbed.astro";
+
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+// Generate one page per project.
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+
+  return projects.map((project) => ({
+    params: { id: project.id },
+    props: { project }
+  }));
+}
+
+const { project } = Astro.props;
+
+const { Content } = await render(project);
+
+const {
+  title,
+  description,
+  category,
+  type,
+  image,
+  youtubeUrl,
+  link
+} = project.data;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  currentPage="projects"
+>
+  <article class="project-page container">
+
+    <a class="back-link" href="/projects/">
+      ← Back to Projects
+    </a>
+
+    <div class="project-header">
+      <div class="categories">
+        <span>{category}</span>
+        <span>{type}</span>
+      </div>
+
+      <h1>{title}</h1>
+      <p>{description}</p>
+    </div>
+
+    <section class="project-media">
+      {youtubeUrl ? (
+        <YouTubeEmbed
+          url={youtubeUrl}
+          title={`${title} Gameplay`}
+        />
+      ) : image ? (
+        <img
+          src={image}
+          alt={title}
+        />
+      ) : null}
+    </section>
+
+    {link && (
+      <div class="project-links">
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Visit Project ↗
+        </a>
+      </div>
+    )}
+
+    <section class="project-content">
+      <Content />
+    </section>
+
+    {youtubeUrl && (
+      <div class="extra-links">
+        <a
+          href={youtubeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Watch on YouTube ↗
+        </a>
+      </div>
+    )}
+
+  </article>
+</BaseLayout>
+
+
+<style>
+  .project-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+    color: var(--color-text);
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 2rem;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .project-header {
+    margin-bottom: 2rem;
+  }
+
+  .project-header h1 {
+    color: var(--color-text);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    line-height: 1.1;
+    margin: 1rem 0;
+  }
+
+  .project-header p {
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    line-height: 1.7;
+    max-width: 700px;
+  }
+
+  .categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .categories span {
+    background: var(--color-surface-light);
+    color: var(--color-accent);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-transform: capitalize;
+    font-size: 0.85rem;
+  }
+
+  .project-media {
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .project-media img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .project-links {
+    margin: 2rem 0;
+  }
+
+  .project-links a {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background: var(--color-accent);
+    color: var(--color-background);
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .project-content {
+    margin-top: 3rem;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+  }
+
+  .project-content :global(h1),
+  .project-content :global(h2),
+  .project-content :global(h3) {
+    color: var(--color-text);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .project-content :global(p) {
+    margin-bottom: 1.25rem;
+  }
+
+  .project-content :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .project-content :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .extra-links {
+    margin-top: 3rem;
+  }
+
+  .extra-links a {
+    color: var(--color-accent);
+  }
+</style>

@@ -1,9 +1,25 @@
-body{
-  font: 15px/1.5 Ariel, Helvetica, sans-serif;
-  padding:0;
-  margin:0;
-  background-color: #f4f4f4
+:root {
+  --color-background: #121820;
+  --color-surface: #1d2631;
+  --color-surface-light: #293442;
+
+  --color-text: #f4f6f8;
+  --color-text-muted: #b5c0cc;
+
+  --color-accent: #b8d47a;
+  --color-accent-hover: #d0ed97;
+
+  --color-border: #364252;
 }
+
+body {
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
 
 /* Global */
 .container{
