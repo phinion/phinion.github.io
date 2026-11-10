@@ -1,0 +1,38 @@
+---
+interface Props {
+  currentPage?: string;
+}
+
+const { currentPage = "home" } = Astro.props;
+
+const links = [
+  { label: "Home", href: "/", id: "home" },
+  { label: "Projects", href: "/projects/", id: "projects" },
+  { label: "Blog", href: "/blog/", id: "blog" },
+  { label: "About", href: "/about/", id: "about" },
+  { label: "Contact", href: "/contact/", id: "contact" }
+];
+---
+
+<header>
+  <div class="container">
+    <div id="branding">
+      <h1><span class="highlight">YVS</span></h1>
+    </div>
+
+    <nav aria-label="Main navigation">
+      <ul>
+        {links.map((link) => (
+          <li class={currentPage === link.id ? "current" : ""}>
+            <a
+              href={link.href}
+              aria-current={currentPage === link.id ? "page" : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
