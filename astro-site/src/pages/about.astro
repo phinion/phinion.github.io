@@ -1,0 +1,127 @@
+
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const interests = [
+  "Game Development",
+  "Music & Guitar",
+  "Dance",
+  "Climbing & Fitness",
+  "Technology",
+  "Creative Projects"
+];
+---
+
+<BaseLayout
+  title="About"
+  description="Learn more about Yash, his background and interests."
+  currentPage="about"
+>
+  <section class="about-page container">
+    <h1>About Me</h1>
+
+    <div class="about-intro">
+      <div>
+        <h2>Hey, I'm Yash!</h2>
+
+        <p>
+          I'm a games software engineer who loves
+          creating interactive experiences.
+        </p>
+
+        <p>
+          I enjoy solving interesting technical problems,
+          experimenting with new technologies, and
+          bringing creative ideas to life.
+        </p>
+      </div>
+
+      <img
+        src="/img/me.JPG"
+        alt="Portrait of Yash"
+        width="280"
+      />
+    </div>
+
+    <section>
+      <h2>Career & Experience</h2>
+      <p>
+        I specialise in Unity and C#, with experience
+        developing gameplay systems, tools and
+        cross-platform software.
+      </p>
+      <p>
+        I've worked on professional game projects,
+        supported development teams and contributed
+        to bringing games to different platforms.
+      </p>
+    </section>
+
+    <section>
+      <h2>Background & Education</h2>
+      <p>
+        I studied Games Software Engineering at
+        Bournemouth University, graduating in 2020.
+      </p>
+    </section>
+
+    <section>
+      <h2>Beyond Programming</h2>
+      <p>
+        Outside development, I enjoy music, dance,
+        gaming and trying new things.
+      </p>
+
+      <div class="interests">
+        {interests.map((interest) => (
+          <span>{interest}</span>
+        ))}
+      </div>
+    </section>
+  </section>
+</BaseLayout>
+
+<style>
+  .about-page {
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+  }
+
+  .about-page section {
+    margin-bottom: 3rem;
+  }
+
+  .about-intro {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin: 2rem 0 3rem;
+  }
+
+  .about-intro img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+  }
+
+  .interests {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .interests span {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background: #303746;
+    color: white;
+  }
+
+  @media (max-width: 700px) {
+    .about-intro {
+      flex-direction: column-reverse;
+      align-items: flex-start;
+    }
+  }
+</style>

@@ -1,0 +1,184 @@
+
+---
+interface Props {
+  title: string;
+  description: string;
+  category: string;
+  image?: string;
+  youtubeUrl?: string;
+  link?: string;
+}
+
+const {
+  title,
+  description,
+  category,
+  image,
+  youtubeUrl,
+  link
+} = Astro.props;
+
+// Convert a full YouTube URL into an embeddable URL.
+function getYouTubeEmbedUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    let videoId: string | null = null;
+
+    if (host === "youtu.be") {
+      videoId = parsed.pathname.split("/")[1];
+    } else if (
+      host === "youtube.com" ||
+      host === "www.youtube.com" ||
+      host === "m.youtube.com" ||
+      host === "www.youtube-nocookie.com"
+    ) {
+      if (parsed.pathname === "/watch") {
+        videoId = parsed.searchParams.get("v");
+      } else if (
+        parsed.pathname.startsWith("/embed/") ||
+        parsed.pathname.startsWith("/shorts/") ||
+        parsed.pathname.startsWith("/live/")
+      ) {
+        videoId = parsed.pathname.split("/")[2];
+      }
+    }
+
+    // Validate the YouTube video ID.
+    if (!videoId || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+      return null;
+    }
+
+    return `https://www.youtube-nocookie.com/embed/${videoId}`;
+  } catch {
+    return null;
+  }
+}
+
+const embedUrl = youtubeUrl
+  ? getYouTubeEmbedUrl(youtubeUrl)
+  : null;
+---
+
+<article class="project-card">
+  <div class="project-media">
+    {embedUrl ? (
+      <iframe
+        src={embedUrl}
+        title={`${title} video`}
+        loading="lazy"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen
+      ></iframe>
+    ) : image ? (
+      <img
+        src={image}
+        alt={title}
+        loading="lazy"
+      />
+    ) : (
+      <div class="placeholder">🎮</div>
+    )}
+  </div>
+
+  <div class="project-info">
+    <span class="category">{category}</span>
+
+    <h2>{title}</h2>
+
+    <p>{description}</p>
+
+    {link && (
+      <a
+        href={link}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Visit project
+      </a>
+    )}
+
+    {youtubeUrl && (
+      <a
+        href={youtubeUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="youtube-link"
+      >
+        Watch on YouTube
+      </a>
+    )}
+  </div>
+</article>
+
+<style>
+  .project-card {
+    background: #202530;
+    color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+  }
+
+  .project-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .project-media {
+    aspect-ratio: 16 / 9;
+    background: #141820;
+  }
+
+  .project-media iframe,
+  .project-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    object-fit: cover;
+  }
+
+  .placeholder {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    font-size: 3rem;
+  }
+
+  .project-info {
+    padding: 1.25rem;
+  }
+
+  .category {
+    color: #b8d47a;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+
+  h2 {
+    margin: 0.75rem 0;
+    font-size: 1.4rem;
+  }
+
+  p {
+    line-height: 1.6;
+  }
+
+  a {
+    display: inline-block;
+    margin-top: 0.75rem;
+    margin-right: 1rem;
+    color: #b8d47a;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .youtube-link {
+    color: #ff7878;
+  }
+</style>
