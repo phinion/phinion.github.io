@@ -2,18 +2,32 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 
-// Get published blog posts only.
+// Get published articles only.
 const posts = await getCollection(
   "blog",
   ({ data }) => !data.draft
 );
 
-// Newest posts first.
-const sortedPosts = posts.sort(
+// Sort newest first.
+const sortedPosts = [...posts].sort(
   (a, b) =>
     b.data.pubDate.getTime() -
     a.data.pubDate.getTime()
 );
+
+const categories = [
+  { value: "all", label: "All" },
+  { value: "devlog", label: "Devlogs" },
+  { value: "technical", label: "Technical" },
+  { value: "personal", label: "Personal" },
+  { value: "creative", label: "Creative" }
+];
+
+const tags = [
+  ...new Set(
+    sortedPosts.flatMap((post) => post.data.tags)
+  )
+].sort((a, b) => a.localeCompare(b));
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString("en-GB", {
@@ -31,18 +45,72 @@ function formatDate(date: Date): string {
   currentPage="blog"
 >
   <section class="blog-page container">
-    <header class="blog-intro">
+
+    <div class="blog-intro">
       <h1>My Blog</h1>
 
       <p>
         Devlogs, technical experiments, creative
         projects and whatever else I'm working on.
       </p>
-    </header>
+    </div>
+
+    <div class="blog-filters">
+
+      <h2>Categories</h2>
+
+      <div class="filter-group" id="blog-categories">
+        {categories.map((category) => (
+          <button
+            type="button"
+            data-category={category.value}
+            class={category.value === "all" ? "active" : ""}
+            aria-pressed={category.value === "all"}
+          >
+            {category.label}
+          </button>
+        ))}
+      </div>
+
+      <h2>Tags</h2>
+
+      <div class="filter-group" id="blog-tags">
+
+        <button
+          type="button"
+          data-tag="all"
+          class="active"
+          aria-pressed="true"
+        >
+          All
+        </button>
+
+        {tags.map((tag) => (
+          <button
+            type="button"
+            data-tag={tag}
+            aria-pressed="false"
+          >
+            {tag}
+          </button>
+        ))}
+
+      </div>
+    </div>
+
+    <p id="blog-count" aria-live="polite">
+      {sortedPosts.length} articles
+    </p>
 
     <div class="blog-grid">
+
       {sortedPosts.map((post) => (
-        <article class="blog-card">
+        <article
+          class="blog-card"
+          data-category={post.data.category}
+          data-tags={JSON.stringify(post.data.tags)}
+        >
+
           {post.data.image && (
             <img
               src={post.data.image}
@@ -52,7 +120,9 @@ function formatDate(date: Date): string {
           )}
 
           <div class="blog-card-content">
+
             <div class="post-meta">
+
               <span class="category">
                 {post.data.category}
               </span>
@@ -60,6 +130,7 @@ function formatDate(date: Date): string {
               <time datetime={post.data.pubDate.toISOString()}>
                 {formatDate(post.data.pubDate)}
               </time>
+
             </div>
 
             <h2>
@@ -70,25 +141,153 @@ function formatDate(date: Date): string {
 
             <p>{post.data.description}</p>
 
-            <div class="tags">
-              {post.data.tags.map((tag) => (
-                <span class="tag">{tag}</span>
-              ))}
-            </div>
+            {post.data.tags.length > 0 && (
+              <div class="tags">
+                {post.data.tags.map((tag) => (
+                  <span class="tag">{tag}</span>
+                ))}
+              </div>
+            )}
 
-            <a class="read-more" href={`/blog/${post.id}/`}>
+            <a
+              class="read-more"
+              href={`/blog/${post.id}/`}
+            >
               Read Article →
             </a>
+
           </div>
         </article>
       ))}
+
     </div>
 
+    <p id="blog-empty" hidden>
+      No articles match these filters.
+    </p>
+
     {sortedPosts.length === 0 && (
-      <p>No published posts yet. Check back soon!</p>
+      <p class="no-posts">
+        No published posts yet. Check back soon!
+      </p>
     )}
+
   </section>
 </BaseLayout>
+
+<script>
+  const categoryButtons =
+    document.querySelectorAll<HTMLButtonElement>(
+      "#blog-categories button"
+    );
+
+  const tagButtons =
+    document.querySelectorAll<HTMLButtonElement>(
+      "#blog-tags button"
+    );
+
+  const articles =
+    document.querySelectorAll<HTMLElement>(
+      ".blog-card"
+    );
+
+  const count =
+    document.querySelector<HTMLElement>("#blog-count");
+
+  const emptyMessage =
+    document.querySelector<HTMLElement>("#blog-empty");
+
+  let selectedCategory = "all";
+  let selectedTag = "all";
+
+  function updateArticles() {
+    let visibleCount = 0;
+
+    articles.forEach((article) => {
+      const articleTags: string[] = JSON.parse(
+        article.dataset.tags ?? "[]"
+      );
+
+      const matchesCategory =
+        selectedCategory === "all" ||
+        article.dataset.category === selectedCategory;
+
+      const matchesTag =
+        selectedTag === "all" ||
+        articleTags.some(
+          (tag) => tag.toLowerCase() === selectedTag.toLowerCase()
+        );
+
+      const visible = matchesCategory && matchesTag;
+
+      article.hidden = !visible;
+
+      if (visible) {
+        visibleCount++;
+      }
+    });
+
+    if (count) {
+      count.textContent =
+        `${visibleCount} article${visibleCount === 1 ? "" : "s"}`;
+    }
+
+    if (emptyMessage) {
+      emptyMessage.hidden =
+        visibleCount !== 0 || articles.length === 0;
+    }
+  }
+
+  function setActiveButton(
+    buttons: NodeListOf<HTMLButtonElement>,
+    selectedValue: string,
+    dataKey: "category" | "tag"
+  ) {
+    buttons.forEach((button) => {
+      const active =
+        button.dataset[dataKey] === selectedValue;
+
+      button.classList.toggle("active", active);
+
+      button.setAttribute(
+        "aria-pressed",
+        String(active)
+      );
+    });
+  }
+
+  categoryButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedCategory =
+        button.dataset.category ?? "all";
+
+      setActiveButton(
+        categoryButtons,
+        selectedCategory,
+        "category"
+      );
+
+      updateArticles();
+    });
+  });
+
+  tagButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedTag =
+        button.dataset.tag ?? "all";
+
+      setActiveButton(
+        tagButtons,
+        selectedTag,
+        "tag"
+      );
+
+      updateArticles();
+    });
+  });
+
+  updateArticles();
+</script>
 
 <style>
   .blog-page {
@@ -96,11 +295,7 @@ function formatDate(date: Date): string {
   }
 
   .blog-intro {
-    background: transparent;
-    border: 0;
-    color: inherit;
     margin-bottom: 2.5rem;
-    padding: 0;
   }
 
   .blog-intro h1 {
@@ -111,24 +306,82 @@ function formatDate(date: Date): string {
   .blog-intro p {
     color: var(--color-text-muted, #b5c0cc);
     font-size: 1.1rem;
+    line-height: 1.7;
+  }
+
+  .blog-filters {
+    margin: 2rem 0;
+  }
+
+  .blog-filters h2 {
+    margin: 1.5rem 0 0.75rem;
+    font-size: 1rem;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .filter-group button {
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--color-border, #364252);
+    border-radius: 8px;
+    background: var(--color-surface, #1d2631);
+    color: var(--color-text, white);
+
+    cursor: pointer;
+    text-transform: capitalize;
+
+    transition: background 0.2s;
+  }
+
+  .filter-group button:hover {
+    background: var(--color-surface-light, #293442);
+  }
+
+  .filter-group button.active {
+    background: var(--color-accent, #b8d47a);
+    border-color: transparent;
+    color: #121820;
+  }
+
+  .filter-group button:focus-visible {
+    outline: 2px solid var(--color-accent, #b8d47a);
+    outline-offset: 3px;
+  }
+
+  #blog-count {
+    color: var(--color-text-muted, #b5c0cc);
+    margin-bottom: 1.5rem;
   }
 
   .blog-grid {
     display: grid;
     grid-template-columns:
       repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+
     gap: 1.5rem;
   }
 
   .blog-card {
     display: flex;
     flex-direction: column;
+
     background: var(--color-surface, #1d2631);
     border-radius: 12px;
     overflow: hidden;
+
+    transition: transform 0.2s ease;
+  }
+
+  .blog-card:hover {
+    transform: translateY(-3px);
   }
 
   .blog-card > img {
+    display: block;
     width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
@@ -146,6 +399,7 @@ function formatDate(date: Date): string {
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 0.75rem;
+
     font-size: 0.85rem;
     color: var(--color-text-muted, #b5c0cc);
   }
@@ -155,23 +409,23 @@ function formatDate(date: Date): string {
     text-transform: capitalize;
   }
 
-  h2 {
+  .blog-card h2 {
     font-size: 1.4rem;
     margin: 1rem 0;
   }
 
-  h2 a {
+  .blog-card h2 a {
     color: var(--color-text, white);
     text-decoration: none;
   }
 
-  h2 a:hover {
+  .blog-card h2 a:hover {
     color: var(--color-accent, #b8d47a);
   }
 
   .blog-card-content > p {
-    line-height: 1.6;
     color: var(--color-text-muted, #b5c0cc);
+    line-height: 1.6;
   }
 
   .tags {
@@ -194,5 +448,38 @@ function formatDate(date: Date): string {
     color: var(--color-accent, #b8d47a);
     text-decoration: none;
     font-weight: 600;
+  }
+
+  .read-more:hover {
+    text-decoration: underline;
+  }
+
+  .blog-card[hidden],
+  #blog-empty[hidden] {
+    display: none !important;
+  }
+
+  #blog-empty,
+  .no-posts {
+    padding: 3rem;
+    text-align: center;
+    color: var(--color-text-muted, #b5c0cc);
+  }
+
+  @media (max-width: 600px) {
+    .blog-page {
+      padding: 2rem 1rem 4rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blog-card,
+    .filter-group button {
+      transition: none;
+    }
+
+    .blog-card:hover {
+      transform: none;
+    }
   }
 </style>

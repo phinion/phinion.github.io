@@ -1,8 +1,12 @@
-
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-import { getCollection, render } from "astro:content";
+import {
+  getCollection,
+  getEntry,
+  render
+} from "astro:content";
+
 import type { CollectionEntry } from "astro:content";
 
 interface Props {
@@ -34,6 +38,10 @@ const {
   image
 } = post.data;
 
+const relatedProject = post.data.project
+  ? await getEntry(post.data.project)
+  : undefined;
+
 function formatDate(date: Date): string {
   return date.toLocaleDateString("en-GB", {
     day: "numeric",
@@ -55,13 +63,19 @@ function formatDate(date: Date): string {
     </a>
 
     <div class="article-header">
-      <span class="category">{category}</span>
+
+      <span class="category">
+        {category}
+      </span>
 
       <h1>{title}</h1>
 
-      <p class="description">{description}</p>
+      <p class="description">
+        {description}
+      </p>
 
       <div class="dates">
+
         <time datetime={pubDate.toISOString()}>
           Published {formatDate(pubDate)}
         </time>
@@ -71,26 +85,55 @@ function formatDate(date: Date): string {
             Updated {formatDate(updatedDate)}
           </time>
         )}
+
       </div>
 
-      <div class="tags">
-        {tags.map((tag) => (
-          <span>{tag}</span>
-        ))}
-      </div>
+      {tags.length > 0 && (
+        <div class="tags">
+          {tags.map((tag) => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      )}
+
     </div>
 
     {image && (
-      <img class="cover-image" src={image} alt="" />
+      <img
+        class="cover-image"
+        src={image}
+        alt=""
+      />
+    )}
+
+    {relatedProject && (
+      <aside class="related-project">
+
+        <span class="related-label">
+          Part of a project
+        </span>
+
+        <a href={`/projects/${relatedProject.id}/`}>
+          {relatedProject.data.title} →
+        </a>
+
+        <p>
+          {relatedProject.data.description}
+        </p>
+
+      </aside>
     )}
 
     <div class="article-content">
       <Content />
     </div>
 
-    <footer class="article-footer">
-      <a href="/blog/">← More articles</a>
-    </footer>
+    <div class="article-footer">
+      <a href="/blog/">
+        ← More articles
+      </a>
+    </div>
+
   </article>
 </BaseLayout>
 
@@ -108,24 +151,20 @@ function formatDate(date: Date): string {
     text-decoration: none;
   }
 
+  .back-link:hover,
+  .article-footer a:hover {
+    text-decoration: underline;
+  }
+
   .article-header {
-    padding: 0;
     margin: 2rem 0;
-    background: transparent;
-    border: 0;
-    color: inherit;
   }
 
   .article-header h1 {
     font-size: clamp(2.5rem, 6vw, 4rem);
     line-height: 1.15;
     margin: 1rem 0;
-  }
-
-  .description {
-    font-size: 1.2rem;
-    line-height: 1.7;
-    color: var(--color-text-muted, #b5c0cc);
+    color: var(--color-text, #f4f6f8);
   }
 
   .category {
@@ -134,10 +173,19 @@ function formatDate(date: Date): string {
     font-weight: 600;
   }
 
+  .description {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: var(--color-text-muted, #b5c0cc);
+  }
+
+
   .dates {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
+    margin-top: 1rem;
+
     color: var(--color-text-muted, #b5c0cc);
     font-size: 0.9rem;
   }
@@ -149,7 +197,7 @@ function formatDate(date: Date): string {
     margin-top: 1.5rem;
   }
 
-  .tags span {
+  .tag {
     padding: 0.3rem 0.75rem;
     background: var(--color-surface-light, #293442);
     border-radius: 6px;
@@ -157,10 +205,43 @@ function formatDate(date: Date): string {
   }
 
   .cover-image {
+    display: block;
     width: 100%;
     height: auto;
     border-radius: 12px;
     margin: 2rem 0;
+  }
+
+  .related-project {
+    background: var(--color-surface, #1d2631);
+    border-left: 3px solid var(--color-accent, #b8d47a);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin: 2rem 0;
+  }
+
+  .related-label {
+    display: block;
+    color: var(--color-text-muted, #b5c0cc);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .related-project a {
+    color: var(--color-accent, #b8d47a);
+    font-size: 1.15rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .related-project a:hover {
+    text-decoration: underline;
+  }
+
+  .related-project p {
+    color: var(--color-text-muted, #b5c0cc);
+    margin: 0.75rem 0 0;
+    line-height: 1.6;
   }
 
   .article-content {
@@ -198,11 +279,22 @@ function formatDate(date: Date): string {
     border-radius: 8px;
   }
 
+  .article-content :global(blockquote) {
+    border-left: 3px solid var(--color-accent, #b8d47a);
+    padding-left: 1.25rem;
+    margin: 1.5rem 0;
+    color: var(--color-text-muted, #b5c0cc);
+  }
+
   .article-footer {
     margin-top: 4rem;
-    padding: 2rem 0 0;
-    background: transparent;
+    padding-top: 2rem;
     border-top: 1px solid var(--color-border, #364252);
-    color: inherit;
+  }
+
+  @media (max-width: 600px) {
+    .blog-post {
+      padding: 2rem 1rem 4rem;
+    }
   }
 </style>
