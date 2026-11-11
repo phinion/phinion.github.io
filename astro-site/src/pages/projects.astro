@@ -1,3 +1,4 @@
+
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ProjectCard from "../components/ProjectCard.astro";
@@ -5,9 +6,23 @@ import { getCollection } from "astro:content";
 
 const projects = await getCollection("projects");
 
-const sortedProjects = projects.sort((a, b) =>
+const sortedProjects = [...projects].sort((a, b) =>
   a.data.title.localeCompare(b.data.title)
 );
+
+const categories = [
+  { value: "all", label: "All" },
+  { value: "professional", label: "Professional" },
+  { value: "personal", label: "Personal" },
+  { value: "university", label: "University" }
+];
+
+const types = [
+  { value: "all", label: "All" },
+  { value: "game", label: "Games" },
+  { value: "software", label: "Software" },
+  { value: "other", label: "Other" }
+];
 ---
 
 <BaseLayout
@@ -16,31 +31,218 @@ const sortedProjects = projects.sort((a, b) =>
   currentPage="projects"
 >
   <section class="projects-page container">
-    <h1>My Projects</h1>
 
+    <h1>My Projects</h1>
     <p>
-      A collection of games, software and
-      creative projects I've worked on.
+      Explore the games, software and creative
+      projects I've worked on.
     </p>
+
+    <!-- Category filters -->
+    <div class="filters">
+      <h2>Experience</h2>
+
+      <div class="filter-group" id="category-filters">
+        {categories.map((category) => (
+          <button
+            type="button"
+            class={category.value === "all" ? "active" : ""}
+            data-category={category.value}
+            aria-pressed={category.value === "all"}
+          >
+            {category.label}
+          </button>
+        ))}
+      </div>
+
+      <h2>Project Type</h2>
+
+      <div class="filter-group" id="type-filters">
+        {types.map((type) => (
+          <button
+            type="button"
+            class={type.value === "all" ? "active" : ""}
+            data-type={type.value}
+            aria-pressed={type.value === "all"}
+          >
+            {type.label}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <!-- Project gallery -->
+    <p id="project-count" aria-live="polite"></p>
 
     <div class="project-grid">
       {sortedProjects.map((project) => (
-        <ProjectCard
-          title={project.data.title}
-          description={project.data.description}
-          category={project.data.category}
-          image={project.data.image}
-          youtubeUrl={project.data.youtubeUrl}
-          link={`/projects/${project.id}/`}
-        />
+        <div
+          class="project-item"
+          data-category={project.data.category}
+          data-type={project.data.type}
+        >
+          <ProjectCard
+            title={project.data.title}
+            description={project.data.description}
+            category={project.data.category}
+            image={project.data.image}
+            youtubeUrl={project.data.youtubeUrl}
+            link={`/projects/${project.id}/`}
+          />
+        </div>
       ))}
     </div>
+
+    <p id="no-results" hidden>
+      No projects match these filters.
+    </p>
+
   </section>
 </BaseLayout>
+
+<script>
+  const categoryButtons =
+    document.querySelectorAll<HTMLButtonElement>(
+      "#category-filters button"
+    );
+
+  const typeButtons =
+    document.querySelectorAll<HTMLButtonElement>(
+      "#type-filters button"
+    );
+
+  const projectItems =
+    document.querySelectorAll<HTMLElement>(
+      ".project-item"
+    );
+
+  const count = document.querySelector<HTMLElement>(
+    "#project-count"
+  );
+
+  const noResults = document.querySelector<HTMLElement>(
+    "#no-results"
+  );
+
+  let selectedCategory = "all";
+  let selectedType = "all";
+
+  function updateProjects() {
+    let visibleCount = 0;
+
+    projectItems.forEach((item) => {
+      const matchesCategory =
+        selectedCategory === "all" ||
+        item.dataset.category === selectedCategory;
+
+      const matchesType =
+        selectedType === "all" ||
+        item.dataset.type === selectedType;
+
+      const visible = matchesCategory && matchesType;
+
+      item.hidden = !visible;
+
+      if (visible) visibleCount++;
+    });
+
+    if (count) {
+      count.textContent =
+        `${visibleCount} project${visibleCount === 1 ? "" : "s"}`;
+    }
+
+    if (noResults) {
+      noResults.hidden = visibleCount !== 0;
+    }
+  }
+
+  function updateButtons(
+    buttons: NodeListOf<HTMLButtonElement>,
+    selected: string,
+    attribute: "category" | "type"
+  ) {
+    buttons.forEach((button) => {
+      const active = button.dataset[attribute] === selected;
+
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+  }
+
+  categoryButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedCategory = button.dataset.category ?? "all";
+
+      updateButtons(
+        categoryButtons,
+        selectedCategory,
+        "category"
+      );
+
+      updateProjects();
+    });
+  });
+
+  typeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedType = button.dataset.type ?? "all";
+
+      updateButtons(typeButtons, selectedType, "type");
+
+      updateProjects();
+    });
+  });
+
+  updateProjects();
+</script>
 
 <style>
   .projects-page {
     padding: 3rem 0 4rem;
+  }
+
+  .filters {
+    margin: 2rem 0;
+  }
+
+  .filters h2 {
+    font-size: 1rem;
+    margin: 1.5rem 0 0.75rem;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .filter-group button {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid var(--color-border, #364252);
+    border-radius: 8px;
+    background: var(--color-surface, #1d2631);
+    color: var(--color-text, white);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .filter-group button:hover {
+    background: var(--color-surface-light, #293442);
+  }
+
+  .filter-group button.active {
+    background: var(--color-accent, #b8d47a);
+    color: #121820;
+    border-color: transparent;
+  }
+
+  .filter-group button:focus-visible {
+    outline: 2px solid var(--color-accent, #b8d47a);
+    outline-offset: 3px;
+  }
+
+  #project-count {
+    color: var(--color-text-muted, #b5c0cc);
   }
 
   .project-grid {
@@ -49,5 +251,26 @@ const sortedProjects = projects.sort((a, b) =>
       repeat(auto-fit, minmax(min(100%, 300px), 1fr));
     gap: 1.5rem;
     margin-top: 2rem;
+  }
+
+  .project-item {
+    min-width: 0;
+  }
+
+  .project-item[hidden],
+  #no-results[hidden] {
+    display: none !important;
+  }
+
+  #no-results {
+    text-align: center;
+    padding: 3rem;
+    color: var(--color-text-muted, #b5c0cc);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .filter-group button {
+      transition: none;
+    }
   }
 </style>
