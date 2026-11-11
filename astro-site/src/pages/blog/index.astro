@@ -1,0 +1,198 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+// Get published blog posts only.
+const posts = await getCollection(
+  "blog",
+  ({ data }) => !data.draft
+);
+
+// Newest posts first.
+const sortedPosts = posts.sort(
+  (a, b) =>
+    b.data.pubDate.getTime() -
+    a.data.pubDate.getTime()
+);
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC"
+  });
+}
+---
+
+<BaseLayout
+  title="Blog"
+  description="Devlogs, technical articles and creative thoughts."
+  currentPage="blog"
+>
+  <section class="blog-page container">
+    <header class="blog-intro">
+      <h1>My Blog</h1>
+
+      <p>
+        Devlogs, technical experiments, creative
+        projects and whatever else I'm working on.
+      </p>
+    </header>
+
+    <div class="blog-grid">
+      {sortedPosts.map((post) => (
+        <article class="blog-card">
+          {post.data.image && (
+            <img
+              src={post.data.image}
+              alt=""
+              loading="lazy"
+            />
+          )}
+
+          <div class="blog-card-content">
+            <div class="post-meta">
+              <span class="category">
+                {post.data.category}
+              </span>
+
+              <time datetime={post.data.pubDate.toISOString()}>
+                {formatDate(post.data.pubDate)}
+              </time>
+            </div>
+
+            <h2>
+              <a href={`/blog/${post.id}/`}>
+                {post.data.title}
+              </a>
+            </h2>
+
+            <p>{post.data.description}</p>
+
+            <div class="tags">
+              {post.data.tags.map((tag) => (
+                <span class="tag">{tag}</span>
+              ))}
+            </div>
+
+            <a class="read-more" href={`/blog/${post.id}/`}>
+              Read Article →
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    {sortedPosts.length === 0 && (
+      <p>No published posts yet. Check back soon!</p>
+    )}
+  </section>
+</BaseLayout>
+
+<style>
+  .blog-page {
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  .blog-intro {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    margin-bottom: 2.5rem;
+    padding: 0;
+  }
+
+  .blog-intro h1 {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    margin-bottom: 1rem;
+  }
+
+  .blog-intro p {
+    color: var(--color-text-muted, #b5c0cc);
+    font-size: 1.1rem;
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: 1.5rem;
+  }
+
+  .blog-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface, #1d2631);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .blog-card > img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .blog-card-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.5rem;
+  }
+
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted, #b5c0cc);
+  }
+
+  .category {
+    color: var(--color-accent, #b8d47a);
+    text-transform: capitalize;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    margin: 1rem 0;
+  }
+
+  h2 a {
+    color: var(--color-text, white);
+    text-decoration: none;
+  }
+
+  h2 a:hover {
+    color: var(--color-accent, #b8d47a);
+  }
+
+  .blog-card-content > p {
+    line-height: 1.6;
+    color: var(--color-text-muted, #b5c0cc);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .tag {
+    padding: 0.3rem 0.65rem;
+    background: var(--color-surface-light, #293442);
+    border-radius: 6px;
+    font-size: 0.8rem;
+  }
+
+  .read-more {
+    margin-top: auto;
+    padding-top: 1rem;
+    color: var(--color-accent, #b8d47a);
+    text-decoration: none;
+    font-weight: 600;
+  }
+</style>

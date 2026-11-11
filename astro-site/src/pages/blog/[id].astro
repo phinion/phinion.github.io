@@ -1,0 +1,208 @@
+
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+export async function getStaticPaths() {
+  const posts = await getCollection(
+    "blog",
+    ({ data }) => !data.draft
+  );
+
+  return posts.map((post) => ({
+    params: { id: post.id },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  category,
+  tags,
+  image
+} = post.data;
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC"
+  });
+}
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  currentPage="blog"
+>
+  <article class="blog-post container">
+    <a href="/blog/" class="back-link">
+      ← Back to Blog
+    </a>
+
+    <div class="article-header">
+      <span class="category">{category}</span>
+
+      <h1>{title}</h1>
+
+      <p class="description">{description}</p>
+
+      <div class="dates">
+        <time datetime={pubDate.toISOString()}>
+          Published {formatDate(pubDate)}
+        </time>
+
+        {updatedDate && (
+          <time datetime={updatedDate.toISOString()}>
+            Updated {formatDate(updatedDate)}
+          </time>
+        )}
+      </div>
+
+      <div class="tags">
+        {tags.map((tag) => (
+          <span>{tag}</span>
+        ))}
+      </div>
+    </div>
+
+    {image && (
+      <img class="cover-image" src={image} alt="" />
+    )}
+
+    <div class="article-content">
+      <Content />
+    </div>
+
+    <footer class="article-footer">
+      <a href="/blog/">← More articles</a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .blog-post {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+    color: var(--color-text, #f4f6f8);
+  }
+
+  .back-link,
+  .article-footer a {
+    color: var(--color-accent, #b8d47a);
+    text-decoration: none;
+  }
+
+  .article-header {
+    padding: 0;
+    margin: 2rem 0;
+    background: transparent;
+    border: 0;
+    color: inherit;
+  }
+
+  .article-header h1 {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    line-height: 1.15;
+    margin: 1rem 0;
+  }
+
+  .description {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: var(--color-text-muted, #b5c0cc);
+  }
+
+  .category {
+    color: var(--color-accent, #b8d47a);
+    text-transform: capitalize;
+    font-weight: 600;
+  }
+
+  .dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    color: var(--color-text-muted, #b5c0cc);
+    font-size: 0.9rem;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .tags span {
+    padding: 0.3rem 0.75rem;
+    background: var(--color-surface-light, #293442);
+    border-radius: 6px;
+    font-size: 0.85rem;
+  }
+
+  .cover-image {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 2rem 0;
+  }
+
+  .article-content {
+    line-height: 1.85;
+    font-size: 1.05rem;
+    overflow-wrap: break-word;
+  }
+
+  .article-content :global(h1),
+  .article-content :global(h2),
+  .article-content :global(h3) {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: var(--color-text, #f4f6f8);
+  }
+
+  .article-content :global(p) {
+    margin-bottom: 1.25rem;
+  }
+
+  .article-content :global(a) {
+    color: var(--color-accent, #b8d47a);
+  }
+
+  .article-content :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .article-content :global(pre) {
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .article-footer {
+    margin-top: 4rem;
+    padding: 2rem 0 0;
+    background: transparent;
+    border-top: 1px solid var(--color-border, #364252);
+    color: inherit;
+  }
+</style>
