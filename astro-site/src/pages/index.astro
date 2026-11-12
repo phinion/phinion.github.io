@@ -1,60 +1,590 @@
-
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { getCollection } from "astro:content";
 
-const projects = [
-  {
-    title: "Real Time Shadows Demo",
-    description:
-      "Real time shadows simulation made using OpenGL in C++",
-    image: "/img/RTS.JPG"
-  },
-  {
-    title: "Incrementum",
-    description:
-      "Unity 3D thriller about human fears. Made in collaboration with 5 other game developers and designers.",
-    image: "/img/Incrementum.JPG"
-  },
-  {
-    title: "Tomb of Anubis",
-    description:
-      "Tabletop board game where players race to the centre of the board while battling each other using cards.",
-    image: "/img/TombOfAnubis.JPG"
-  }
-];
+// Featured projects
+const featuredProjects = (
+  await getCollection("projects")
+)
+  .filter((project) => project.data.featured)
+  .sort((a, b) =>
+    a.data.title.localeCompare(b.data.title)
+  )
+  .slice(0, 3);
+
+// Latest published blog posts
+const recentPosts = (
+  await getCollection(
+    "blog",
+    ({ data }) => !data.draft
+  )
+)
+  .sort((a, b) =>
+    b.data.pubDate.getTime() -
+    a.data.pubDate.getTime()
+  )
+  .slice(0, 3);
+
+// Format dates
+function formatDate(date: Date): string {
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC"
+  });
+}
 ---
 
 <BaseLayout
   title="Home"
-  description="Yash Vishwanath - Games Software Engineer"
+  description="Games, software and creative projects by Yash Vishwanath."
   currentPage="home"
 >
-  <section id="showcase">
-    <div class="container">
-      <h1>Yash Vishwanath</h1>
-      <p>Games Software Engineer</p>
+
+  <section class="hero">
+    <div class="container hero-content">
+
+      <p class="eyebrow">
+        GAMES SOFTWARE ENGINEER
+      </p>
+
+      <h1>
+        Hey, I'm Yash.<br />
+        I make games & cool stuff.
+      </h1>
+
+      <p class="hero-description">
+        I'm a game developer and software engineer
+        who loves building interactive experiences,
+        solving interesting problems and experimenting
+        with creative ideas.
+      </p>
+
+      <div class="hero-actions">
+        <a href="/projects/" class="button primary">
+          Explore My Projects →
+        </a>
+
+        <a href="/about/" class="button secondary">
+          More About Me
+        </a>
+      </div>
+
     </div>
   </section>
 
-  <section class="container">
-    <h1>Welcome to my portfolio!</h1>
-    <p>
-      Check out who I am and projects I have worked on!!
-    </p>
-  </section>
+  <section class="homepage-section container">
 
-  <section id="boxes">
-    <div class="container">
-      {projects.map((project) => (
-        <div class="box">
-          <img
-            src={project.image}
-            alt={project.title}
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">MY WORK</p>
+        <h2>Featured Projects</h2>
+        <p>
+          Some of the games and projects
+          I've worked on.
+        </p>
+      </div>
+
+      <a href="/projects/" class="section-link">
+        All Projects →
+      </a>
+    </div>
+
+    {featuredProjects.length > 0 ? (
+      <div class="featured-grid">
+
+        {featuredProjects.map((project) => (
+          <ProjectCard
+            title={project.data.title}
+            description={project.data.description}
+            category={project.data.category}
+            image={project.data.image}
+            youtubeUrl={project.data.youtubeUrl}
+            link={`/projects/${project.id}/`}
           />
-          <h3>{project.title}</h3>
-          <p>{project.description}</p>
-        </div>
-      ))}
+        ))}
+
+      </div>
+    ) : (
+      <p class="empty-state">
+        Featured projects coming soon!
+      </p>
+    )}
+
+  </section>
+
+  
+  <!-- About Preview -->
+  <section class="about-preview">
+    <div class="container about-preview-content">
+
+      <!-- Left: About text -->
+      <div class="about-text">
+        <p class="eyebrow">BEYOND THE CODE</p>
+
+        <h2>A little about me</h2>
+
+        <p>
+          I enjoy creating things, whether that's
+          games, software, music or something
+          completely different.
+        </p>
+
+        <p>
+          This website is a place to share my work,
+          document what I'm learning and experiment
+          with new ideas.
+        </p>
+
+        <a href="/about/" class="section-link">
+          Get to Know Me →
+        </a>
+      </div>
+
+      <!-- Right: Photo -->
+      <div class="about-image">
+        <img
+          src="/img/me.JPG"
+          alt="Portrait of Yash"
+          loading="lazy"
+        />
+      </div>
+
     </div>
   </section>
+
+
+  <section class="homepage-section container">
+
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">DEVLOG & JOURNAL</p>
+        <h2>Latest From the Blog</h2>
+        <p>
+          Development updates, experiments,
+          technical thoughts and creative projects.
+        </p>
+      </div>
+
+      <a href="/blog/" class="section-link">
+        All Posts →
+      </a>
+    </div>
+
+    {recentPosts.length > 0 ? (
+      <div class="blog-grid">
+
+        {recentPosts.map((post) => (
+          <article class="blog-card">
+
+            {post.data.image && (
+              <img
+                src={post.data.image}
+                alt=""
+                loading="lazy"
+              />
+            )}
+
+            <div class="blog-card-content">
+
+              <div class="blog-meta">
+                <span class="category">
+                  {post.data.category}
+                </span>
+
+                <time
+                  datetime={post.data.pubDate.toISOString()}
+                >
+                  {formatDate(post.data.pubDate)}
+                </time>
+              </div>
+
+              <h3>
+                <a href={`/blog/${post.id}/`}>
+                  {post.data.title}
+                </a>
+              </h3>
+
+              <p>{post.data.description}</p>
+
+              <div class="blog-tags">
+                {post.data.tags.slice(0, 3).map((tag) => (
+                  <span>{tag}</span>
+                ))}
+              </div>
+
+              <a
+                href={`/blog/${post.id}/`}
+                class="read-more"
+              >
+                Read Article →
+              </a>
+
+            </div>
+
+          </article>
+        ))}
+
+      </div>
+    ) : (
+      <p class="empty-state">
+        Blog posts coming soon!
+      </p>
+    )}
+
+  </section>
+
+  <section class="contact-preview">
+    <div class="container">
+
+      <h2>Want to get in touch?</h2>
+
+      <p>
+        Interested in my work, collaborating
+        or just having a chat?
+      </p>
+
+      <a
+        href="https://github.com/phinion"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="button primary"
+      >
+        Find Me on GitHub ↗
+      </a>
+
+    </div>
+  </section>
+
 </BaseLayout>
+
+<style>
+  /* General */
+
+  .homepage-section {
+    padding: 4rem 1.5rem;
+  }
+
+  .eyebrow {
+    color: var(--color-accent, #b8d47a);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .section-heading h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin: 0.5rem 0;
+  }
+
+  .section-heading p {
+    color: var(--color-text-muted, #b5c0cc);
+  }
+
+  .section-link {
+    display: inline-block;
+    color: var(--color-accent, #b8d47a);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .section-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Hero */
+
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 650px;
+    padding: 5rem 1.5rem;
+
+    background-image:
+      linear-gradient(
+        90deg,
+        rgba(10, 15, 25, 0.85) 0%,
+        rgba(10, 15, 25, 0.55) 55%,
+        rgba(10, 15, 25, 0.25) 100%
+      ),
+      url("/img/melong.JPG");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+
+    transform: translateY(-60px);
+  }
+
+
+  .hero h1 {
+    font-size: clamp(2.7rem, 7vw, 5.5rem);
+    line-height: 1.1;
+    margin: 1.5rem 0;
+    color: var(--color-text, white);
+  }
+
+  .hero-description {
+    max-width: 650px;
+    color: var(--color-text-muted, #b5c0cc);
+    font-size: 1.15rem;
+    line-height: 1.8;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  /* Buttons */
+
+  .button {
+    display: inline-block;
+    padding: 0.9rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+  }
+
+  .button:hover {
+    transform: translateY(-2px);
+  }
+
+  .button.primary {
+    background: var(--color-accent, #b8d47a);
+    color: #121820;
+  }
+
+  .button.secondary {
+    background: var(--color-surface-light, #293442);
+    color: var(--color-text, white);
+  }
+
+  /* Featured projects */
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: 1.5rem;
+  }
+
+  /* About preview */
+
+  .about-preview {
+    background: var(--color-surface, #1d2631);
+    padding: 4rem 1.5rem;
+  }
+
+  .about-preview-content {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: center;
+    gap: 4rem;
+
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .about-text {
+    min-width: 0;
+  }
+
+  .about-image {
+    width: 100%;
+    max-width: 360px;
+    justify-self: end;
+    aspect-ratio: 3 / 4;
+
+    overflow: hidden;
+    border-radius: 16px;
+  }
+
+  .about-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 700px) {
+    .about-preview-content {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .about-image {
+      max-width: 320px;
+      justify-self: center;
+    }
+  }
+
+
+  .about-preview h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+
+  .about-preview p {
+    max-width: 700px;
+    line-height: 1.8;
+    color: var(--color-text-muted, #b5c0cc);
+  }
+
+  /* Blog grid */
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: 1.5rem;
+  }
+
+  .blog-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface, #1d2631);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .blog-card > img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .blog-card-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.5rem;
+  }
+
+  .blog-meta {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted, #b5c0cc);
+  }
+
+  .category {
+    color: var(--color-accent, #b8d47a);
+    text-transform: capitalize;
+  }
+
+  .blog-card h3 {
+    font-size: 1.4rem;
+    margin: 1rem 0;
+  }
+
+  .blog-card h3 a {
+    color: var(--color-text, white);
+    text-decoration: none;
+  }
+
+  .blog-card h3 a:hover {
+    color: var(--color-accent, #b8d47a);
+  }
+
+  .blog-card-content > p {
+    color: var(--color-text-muted, #b5c0cc);
+    line-height: 1.6;
+  }
+
+  .blog-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .blog-tags span {
+    background: var(--color-surface-light, #293442);
+    border-radius: 6px;
+    padding: 0.3rem 0.65rem;
+    font-size: 0.8rem;
+  }
+
+  .read-more {
+    margin-top: auto;
+    padding-top: 1rem;
+    color: var(--color-accent, #b8d47a);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  /* Contact preview */
+
+  .contact-preview {
+    padding: 4rem 1.5rem;
+    text-align: center;
+    background: var(--color-surface, #1d2631);
+  }
+
+  .contact-preview h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+
+  .contact-preview p {
+    color: var(--color-text-muted, #b5c0cc);
+    margin-bottom: 2rem;
+  }
+
+  /* Empty state */
+
+  .empty-state {
+    color: var(--color-text-muted, #b5c0cc);
+    padding: 2rem 0;
+  }
+
+  /* Responsive */
+
+  @media (max-width: 700px) {
+    .hero {
+      min-height: 550px;
+      padding: 4rem 1rem;
+      background-position: 65% center;
+    }
+
+    .homepage-section,
+    .about-preview,
+    .contact-preview {
+      padding: 3rem 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .button {
+      transition: none;
+    }
+
+    .button:hover {
+      transform: none;
+    }
+  }
+</style>

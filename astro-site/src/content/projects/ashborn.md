@@ -5,6 +5,7 @@ category: "professional"
 type: "game"
 image: "/img/ashbornIMG.png"
 link: "https://www.fireslugstudios.com/#1"
+featured: true
 ---
 
 # Ashborn
