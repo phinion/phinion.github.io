@@ -14,19 +14,23 @@ const links = [
 ];
 ---
 
-<header>
-  <div class="container">
-    <div id="branding">
-      <h1><span class="highlight">YVS</span></h1>
-    </div>
+<header class="site-header">
+  <div class="container header-content">
+
+    <a href="/" class="site-logo" aria-label="Phinion homepage">
+      YVS
+    </a>
 
     <nav aria-label="Main navigation">
       <ul>
         {links.map((link) => (
-          <li class={currentPage === link.id ? "current" : ""}>
+          <li>
             <a
               href={link.href}
-              aria-current={currentPage === link.id ? "page" : undefined}
+              class={currentPage === link.id ? "active" : ""}
+              aria-current={
+                currentPage === link.id ? "page" : undefined
+              }
             >
               {link.label}
             </a>
@@ -34,5 +38,72 @@ const links = [
         ))}
       </ul>
     </nav>
+
   </div>
 </header>
+
+<style>
+  .site-header {
+    background: var(--color-surface);
+    border-bottom: 2px solid var(--color-orange);
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    min-height: 90px;
+  }
+
+  .site-logo {
+    color: var(--color-orange);
+    font-size: 2rem;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  nav ul {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  nav a {
+    color: var(--color-text);
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  nav a:hover,
+  nav a.active {
+    color: var(--color-accent);
+  }
+
+  @media (max-width: 700px) {
+    .header-content {
+      flex-direction: column;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1.5rem 0;
+    }
+
+    nav ul {
+      justify-content: center;
+      gap: 0.75rem 1.25rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    nav a {
+      transition: none;
+    }
+  }
+</style>

@@ -1,9 +1,38 @@
-
 ---
-const year = 2026; //new Date().getFullYear();
+const year = 2026;//new Date().getFullYear();
 ---
 
-<footer>
-  <p>© {year} Yash Vishwanath</p>
+<footer class="site-footer">
+  <div class="container footer-content">
+    <p>© {year} Yash Vishwanath</p>
+    <p>Made with Astro 🚀</p>
+  </div>
 </footer>
 
+<style>
+  .site-footer {
+    background: var(--color-surface);
+    border-top: 2px solid var(--color-orange);
+    padding: 2rem 0;
+    color: var(--color-text-muted);
+  }
+
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .site-footer p {
+    margin: 0;
+  }
+
+  @media (max-width: 700px) {
+    .footer-content {
+      justify-content: center;
+      text-align: center;
+    }
+  }
+</style>

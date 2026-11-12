@@ -1,3 +1,4 @@
+/* Colour palette */
 :root {
   --color-background: #121820;
   --color-surface: #1d2631;
@@ -9,10 +10,23 @@
   --color-accent: #b8d47a;
   --color-accent-hover: #d0ed97;
 
+  --color-orange: #f15a38;
   --color-border: #364252;
 }
 
+/* Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
+  margin: 0;
   background: var(--color-background);
   color: var(--color-text);
   font-family: system-ui, sans-serif;
@@ -20,223 +34,45 @@ body {
   line-height: 1.6;
 }
 
-
-/* Global */
-.container{
-  width:80%;
-  margin:auto;
-  overflow:hidden;
+/* General layout */
+.container {
+  width: min(90%, 1200px);
+  margin-inline: auto;
 }
 
-ul{
-  margin:0;
-  padding: 0;
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.2;
 }
 
-.dark{
-  padding: 15px;
-  background: #000000;
-  color: #ffffff;
-  margin-top: 10px;
-  margin-bottom: 10px;
+p {
+  line-height: 1.7;
 }
 
-/* Header */
-header{
-  background:#000000;
-  color:#ffffff;
-  padding-top: 30px;
-  min-height: 70px;
-  /*border-bottom: #e8491d 3px solid;*/
+/* Images */
+img {
+  max-width: 100%;
 }
 
-header a{
-  color:#ffffff;
-  text-decoration: none;
-  text-transform: uppercase;
-  font-size: 16px;
+/* Global links */
+a {
+  color: inherit;
 }
 
-header li{
-  float:left;
-  display: inline;
-  padding: 0 20px 0 20px;
+/* Accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
 }
 
-header #branding{
-  float: left;
-}
-
-header #branding h1{
-  margin:0;
-}
-
-header nav{
-  float:right;
-  margin-top: 10px;
-}
-
-header .highlight, header .current a{
-  color: #e8491d;
-  font-weight: bold;
-}
-
-header a:hover{
-  color: #cccccc;
-  font-weight: bold;
-}
-
-/* Showcase */
-#showcase {
-  min-height: 800px;
-  background: url('../img/melong.JPG') no-repeat;
-  background-size:cover;
-  background-position:top;
-  background-color: #000000;
-  text-align: center;
-  color: #e8491d;
-  box-sizing:content-box;
-}
-
-#showcase h1{
-  margin-top:100px;
-  font-size: 55px;
-  margin-bottom: 10px;
-}
-
-#showcase p {
-  font-size: 55px;
-}
-
-/* Boxes */
-#boxes{
-  margin-top:20px;
-}
-
-#boxes .box{
-  float:left;
-  text-align: center;
-  width:30%;
-  padding:10px;
-}
-
-#boxes .box img{
-  width:300px;
-}
-
-/* Sidebars */
-
-aside#about-sidebar{
-  float: right;
-  width: 450px;
-  margin-top: 10px;
-}
-aside#about-sidebar h3{
-  color:#e8491d;
-}
-aside#about-sidebar img{
-  max-height: 425px;
-  max-width: 425px;
-}
-
-aside#technical-skills-sidebar{
-  float: right;
-  width: 450px;
-  margin-top: 10px;
-}
-
-/* main-col */
-article#projects-col{
-  float: left;
-  width: 800px;
-  margin-top: 20px;
-}
-
-article#about-me-col{
-  float: left;
-  width: 800px;
-  margin-top: 20px;
-}
-
-/* projects */
-
-section#project-contents {
-  display:flex;
-}
-
-ul#projects li{
-  list-style: none;
-  padding: 20px;
-  margin-bottom: 5px;
-  background:#40826D;
-}
-ul#projects h3{
-  color:#e8491d;
-  font-size: 30px;
-  width:100%;
-  margin: auto;
-}
-
-ul#projects p{
-  width:400px;
-}
-/* education */
-
-ul#education li{
-  list-style: none;
-  padding: 20px;
-  margin-bottom: 5px;
-  background:#40826D;
-}
-ul#education h3{
-  color:#e8491d;
-  font-size: 20px;
-}
-ul#education h6{
-  color:#e8491d;
-  margin: auto;
-  font-size: 14px;
-}
-
-/* about */
-
-ul#about li{
-  list-style: none;
-  padding: 20px;
-  margin-bottom: 5px;
-  background:#40826D;
-}
-ul#about h3{
-  color:#e8491d;
-  font-size: 30px;
-}
-
-footer{
-  padding: 20px;
-  margin-top: 20px;
-  color: #ffffff;
-  background-color: #e8491d;
-  text-align: center;
-}
-
-/* media queries */
- @media(max-width:768px){
-  header #branding,
-  header nav,
-  header nav li,
-  #boxes .box,
-  article#main-col,
-  aside#sidebar{
-    float:none;
-    text-align: center;
-    width:100%;
-  }
-
-  header{
-    padding-bottom: 20px;
-  }
-
-  #showcase h1{
-    margin-top: 40px;
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
