@@ -6,6 +6,9 @@ type: "game"
 image: "/img/ashbornIMG.png"
 link: "https://www.fireslugstudios.com/#1"
 featured: true
+webgl:
+  embedUrl: "https://itch.io/embed-upload/EXAMPLE?color=121820"
+  title: "Play My Game"
 media:
   - kind: image
     src: "/img/me.JPG"

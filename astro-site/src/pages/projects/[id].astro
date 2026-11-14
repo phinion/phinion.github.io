@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import YouTubeEmbed from "../../components/YouTubeEmbed.astro";
 import ProjectMediaGallery from "../../components/ProjectMediaGallery.astro";
+import UnityWebGLPlayer from "../../components/UnityWebGLPlayer.astro";
 
 import { getCollection, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
@@ -117,6 +118,13 @@ function formatDate(date: Date): string {
     <section class="project-content">
       <Content />
       <ProjectMediaGallery media={project.data.media} />
+
+      {project.data.webgl && (
+        <UnityWebGLPlayer
+          embedUrl={project.data.webgl.embedUrl}
+          title={project.data.webgl.title ?? title}
+        />
+      )}
     </section>
 
     {youtubeUrl && (

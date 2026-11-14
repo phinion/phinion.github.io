@@ -44,7 +44,7 @@ const projects = defineCollection({
     ).default([]),
 
     webgl: z.object({
-      url: z.string(),
+      embedUrl: z.string().url(),
       title: z.string().optional()
     }).optional(),
 
