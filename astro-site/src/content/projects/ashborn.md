@@ -6,6 +6,16 @@ type: "game"
 image: "/img/ashbornIMG.png"
 link: "https://www.fireslugstudios.com/#1"
 featured: true
+media:
+  - kind: image
+    src: "/img/me.JPG"
+    alt: "Temporary gallery test image"
+    caption: "Testing the new media gallery"
+    
+  - kind: image
+    src: "/img/RTS.JPG"
+    alt: "Temporary gallery test image"
+    caption: "Testing the new media gallery 2"
 ---
 
 # Ashborn

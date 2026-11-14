@@ -26,6 +26,28 @@ const projects = defineCollection({
       "other"
     ]).default("game"),
 
+
+    media: z.array(
+      z.discriminatedUnion("kind", [
+        z.object({
+          kind: z.literal("image"),
+          src: z.string(),
+          alt: z.string(),
+          caption: z.string().optional()
+        }),
+        z.object({
+          kind: z.literal("youtube"),
+          url: z.string().url(),
+          caption: z.string().optional()
+        })
+      ])
+    ).default([]),
+
+    webgl: z.object({
+      url: z.string(),
+      title: z.string().optional()
+    }).optional(),
+
     image: z.string().optional(),
     youtubeUrl: z.string().url().optional(),
     link: z.string().url().optional(),
