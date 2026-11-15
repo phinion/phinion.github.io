@@ -8,6 +8,7 @@ interface Props {
   image?: string;
   youtubeUrl?: string;
   link?: string;
+  technologies?: string[];
 }
 
 const {
@@ -16,7 +17,8 @@ const {
   category,
   image,
   youtubeUrl,
-  link
+  link,
+  technologies = []
 } = Astro.props;
 
 // Check whether the project link is internal or external.
@@ -57,6 +59,15 @@ const isExternalLink = link
     <h2>{title}</h2>
 
     <p>{description}</p>
+
+    <!-- Technologies used -->
+    {technologies.length > 0 && (
+      <div class="project-technologies">
+        {technologies.slice(0, 3).map((tech) => (
+          <span class="technology-tag">{tech}</span>
+        ))}
+      </div>
+    )}
 
     <!-- Link to project homepage or external website -->
     {link && (
@@ -160,6 +171,27 @@ const isExternalLink = link
   p {
     line-height: 1.6;
     margin-bottom: 1.5rem;
+  }
+
+  /* Technology tags */
+
+  .project-technologies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .technology-tag {
+    background: var(--color-surface-light, #293442);
+    color: var(--color-accent, #b8d47a);
+
+    padding: 0.3rem 0.6rem;
+    border-radius: 5px;
+
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
   }
 
   /* Links */

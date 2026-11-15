@@ -26,6 +26,8 @@ const projects = defineCollection({
       "other"
     ]).default("game"),
 
+    technologies: z.array(z.string()).default([]),
+    tags: z.array(z.string()).default([]),
 
     media: z.array(
       z.discriminatedUnion("kind", [
