@@ -1,0 +1,78 @@
+/* Colour palette */
+:root {
+  --color-background: #121820;
+  --color-surface: #1d2631;
+  --color-surface-light: #293442;
+
+  --color-text: #f4f6f8;
+  --color-text-muted: #b5c0cc;
+
+  --color-accent: #b8d47a;
+  --color-accent-hover: #d0ed97;
+
+  --color-orange: #f15a38;
+  --color-border: #364252;
+}
+
+/* Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* General layout */
+.container {
+  width: min(90%, 1200px);
+  margin-inline: auto;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.2;
+}
+
+p {
+  line-height: 1.7;
+}
+
+/* Images */
+img {
+  max-width: 100%;
+}
+
+/* Global links */
+a {
+  color: inherit;
+}
+
+/* Accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

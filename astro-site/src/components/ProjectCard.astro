@@ -1,0 +1,231 @@
+---
+import YouTubeEmbed from "./YouTubeEmbed.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  category: string;
+  image?: string;
+  youtubeUrl?: string;
+  link?: string;
+  technologies?: string[];
+}
+
+const {
+  title,
+  description,
+  category,
+  image,
+  youtubeUrl,
+  link,
+  technologies = []
+} = Astro.props;
+
+// Check whether the project link is internal or external.
+const isExternalLink = link
+  ? /^https?:\/\//.test(link)
+  : false;
+---
+
+<article class="project-card">
+
+  <!-- Project media -->
+  <div class="project-media">
+    {youtubeUrl ? (
+      <YouTubeEmbed
+        url={youtubeUrl}
+        title={`${title} Video`}
+      />
+    ) : image ? (
+      <img
+        src={image}
+        alt={title}
+        loading="lazy"
+      />
+    ) : (
+      <div class="placeholder">
+        🎮
+      </div>
+    )}
+  </div>
+
+  <!-- Project information -->
+  <div class="project-info">
+
+    <span class="category">
+      {category}
+    </span>
+
+    <h2>{title}</h2>
+
+    <p>{description}</p>
+
+    <!-- Technologies used -->
+    {technologies.length > 0 && (
+      <div class="project-technologies">
+        {technologies.slice(0, 3).map((tech) => (
+          <span class="technology-tag">{tech}</span>
+        ))}
+      </div>
+    )}
+
+    <!-- Link to project homepage or external website -->
+    {link && (
+      <a
+        href={link}
+        class="project-link"
+        target={isExternalLink ? "_blank" : undefined}
+        rel={isExternalLink ? "noopener noreferrer" : undefined}
+      >
+        View Project →
+      </a>
+    )}
+
+    <!-- Direct YouTube link -->
+    {youtubeUrl && (
+      <a
+        href={youtubeUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="youtube-link"
+      >
+        Watch on YouTube ↗
+      </a>
+    )}
+
+  </div>
+</article>
+
+<style>
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    background: #202530;
+    color: white;
+
+    border-radius: 12px;
+    overflow: hidden;
+
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Media */
+
+  .project-media {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+
+    background: #141820;
+    overflow: hidden;
+  }
+
+  .project-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .placeholder {
+    display: grid;
+    place-items: center;
+
+    width: 100%;
+    height: 100%;
+
+    font-size: 3rem;
+  }
+
+  /* Project information */
+
+  .project-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1;
+
+    padding: 1.25rem;
+  }
+
+  .category {
+    color: #b8d47a;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: capitalize;
+  }
+
+  h2 {
+    margin: 0.75rem 0;
+    font-size: 1.4rem;
+  }
+
+  p {
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Technology tags */
+
+  .project-technologies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .technology-tag {
+    background: var(--color-surface-light, #293442);
+    color: var(--color-accent, #b8d47a);
+
+    padding: 0.3rem 0.6rem;
+    border-radius: 5px;
+
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  /* Links */
+
+  a {
+    display: inline-block;
+    color: #b8d47a;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .project-link {
+    margin-top: auto;
+    padding: 0.5rem 0;
+  }
+
+  .youtube-link {
+    color: #ff7878;
+    margin-top: 0.5rem;
+  }
+
+  /* Accessibility */
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-card {
+      transition: none;
+    }
+
+    .project-card:hover {
+      transform: none;
+    }
+  }
+</style>

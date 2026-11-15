@@ -1,0 +1,100 @@
+---
+interface Props {
+  url: string;
+  title?: string;
+}
+
+const {
+  url,
+  title = "YouTube Video"
+} = Astro.props;
+
+// Convert YouTube links into embed URLs.
+function getYouTubeEmbedUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+
+    let videoId: string | null = null;
+
+    if (host === "youtu.be") {
+      videoId = parsed.pathname.split("/")[1];
+    } else if (
+      host === "youtube.com" ||
+      host === "www.youtube.com" ||
+      host === "m.youtube.com" ||
+      host === "youtube-nocookie.com" ||
+      host === "www.youtube-nocookie.com"
+    ) {
+      if (parsed.pathname === "/watch") {
+        videoId = parsed.searchParams.get("v");
+      } else if (
+        /^\/(embed|shorts|live)\//.test(parsed.pathname)
+      ) {
+        videoId = parsed.pathname.split("/")[2];
+      }
+    }
+
+    if (!videoId || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+      return null;
+    }
+
+    return `https://www.youtube-nocookie.com/embed/${videoId}`;
+  } catch {
+    return null;
+  }
+}
+
+const embedUrl = getYouTubeEmbedUrl(url);
+---
+
+<div class="youtube-container">
+  {embedUrl ? (
+    <iframe
+      src={embedUrl}
+      title={title}
+      loading="lazy"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen
+    ></iframe>
+  ) : (
+    <div class="video-fallback">
+      <p>Video preview unavailable.</p>
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        Open video
+      </a>
+    </div>
+  )}
+</div>
+
+<style>
+  .youtube-container {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #141820;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .video-fallback {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+  }
+
+  .video-fallback a {
+    color: #b8d47a;
+  }
+</style>

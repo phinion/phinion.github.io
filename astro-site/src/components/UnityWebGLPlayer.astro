@@ -1,0 +1,132 @@
+---
+interface Props {
+  embedUrl: string;
+  title?: string;
+}
+
+const {
+  embedUrl,
+  title = "Play Game"
+} = Astro.props;
+---
+
+<section class="webgl-player">
+  <p class="eyebrow">PLAYABLE DEMO</p>
+  <h2>{title}</h2>
+
+  <div class="game-container" data-embed-url={embedUrl}>
+    <div class="game-placeholder">
+      <span class="game-icon" aria-hidden="true">🎮</span>
+      <p>Play this game in your browser</p>
+
+      <button class="play-button" type="button">
+        ▶ Play Game
+      </button>
+    </div>
+  </div>
+
+  <p class="game-note">
+    Hosted on itch.io. Click Play to load the game.
+  </p>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>(
+    ".game-container"
+  ).forEach((container) => {
+    const button =
+      container.querySelector<HTMLButtonElement>(
+        ".play-button"
+      );
+
+    button?.addEventListener("click", () => {
+      const url = container.dataset.embedUrl;
+      if (!url) return;
+
+      const iframe = document.createElement("iframe");
+
+      iframe.src = url;
+      iframe.title = "Playable game hosted on itch.io";
+      iframe.allowFullscreen = true;
+      iframe.setAttribute("allow", "fullscreen; gamepad");
+      iframe.setAttribute("loading", "lazy");
+
+      container.replaceChildren(iframe);
+    });
+  });
+</script>
+
+<style>
+  .webgl-player {
+    margin: 4rem 0;
+  }
+
+  .eyebrow {
+    color: var(--color-accent);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .webgl-player h2 {
+    margin: 0.5rem 0 1.5rem;
+  }
+
+  .game-container {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .game-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .game-icon {
+    font-size: 3rem;
+  }
+
+  .game-placeholder p {
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .play-button {
+    background: var(--color-accent);
+    color: var(--color-background);
+    border: none;
+    border-radius: 8px;
+    padding: 0.9rem 1.5rem;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .play-button:hover {
+    background: var(--color-accent-hover);
+  }
+
+  .game-container iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .game-note {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+  }
+</style>
