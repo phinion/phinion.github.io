@@ -4,7 +4,6 @@ description: "A psychological thriller created in Unity with a team of six devel
 category: "university"
 type: "game"
 youtubeUrl: "https://youtu.be/MnPYQWexebo"
-featured: true
 ---
 
 # Incrementum

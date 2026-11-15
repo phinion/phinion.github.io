@@ -4,6 +4,7 @@ description: "A creative marketing proposal for Bandai Namco's Amazing Katamari 
 category: "university"
 type: "other"
 youtubeUrl: "https://youtu.be/_t-IoOjHXrA"
+featured: true
 
 technologies:
   - Adobe Premiere Pro

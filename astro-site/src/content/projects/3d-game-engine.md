@@ -4,6 +4,7 @@ description: "A custom 3D game engine built from scratch using C++ and OpenGL, f
 category: "university"
 type: "software"
 youtubeUrl: "https://youtu.be/DOHc-LiPZdo"
+featured: true
 
 technologies:
   - C++
